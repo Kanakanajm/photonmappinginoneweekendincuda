@@ -1,4 +1,5 @@
 #include <iostream>
+#include <time.h>
 #include "sphere.h"
 #include "hitable_list.h"
 #include "float.h"
@@ -58,8 +59,8 @@ hitable *random_scene() {
 }
 
 int main() {
-    int nx = 1200;
-    int ny = 800;
+    int nx = 400;
+    int ny = 400;
     int ns = 10;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
     hitable *list[5];
@@ -78,7 +79,8 @@ int main() {
     float aperture = 0.1;
 
     camera cam(lookfrom, lookat, vec3(0,1,0), 20, float(nx)/float(ny), aperture, dist_to_focus);
-
+    clock_t start, stop;
+    start = clock();
     for (int j = ny-1; j >= 0; j--) {
         for (int i = 0; i < nx; i++) {
             vec3 col(0, 0, 0);
@@ -97,6 +99,9 @@ int main() {
             std::cout << ir << " " << ig << " " << ib << "\n";
         }
     }
+    stop = clock();
+    double timer_seconds = ((double)(stop - start)) / CLOCKS_PER_SEC;
+    std::cerr << "took " << timer_seconds << " seconds.\n";
 }
 
 
