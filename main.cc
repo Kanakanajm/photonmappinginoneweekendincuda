@@ -5,6 +5,7 @@
 #include "float.h"
 #include "camera.h"
 #include "material.h"
+#include "bvh.h"
 
 
 vec3 color(const ray& r, hitable *world, int depth) {
@@ -55,23 +56,23 @@ hitable *random_scene() {
     list[i++] = new sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1)));
     list[i++] = new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0));
 
-    return new hitable_list(list,i);
+    return new bvh_node(list, i);
+}
+
+hitable *create_test_world() {
+    hitable **list = new hitable*[3];
+    list[1] = new sphere(vec3(0, 1, 0), 1.0, new dielectric(1.5));
+    list[0] = new sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1)));
+    list[2] = new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0));
+    return new bvh_node(list, 3);
 }
 
 int main() {
-    int nx = 400;
-    int ny = 400;
+    int nx = 1200;
+    int ny = 800;
     int ns = 10;
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
-    hitable *list[5];
-    float R = cos(M_PI/4);
-    list[0] = new sphere(vec3(0,0,-1), 0.5, new lambertian(vec3(0.1, 0.2, 0.5)));
-    list[1] = new sphere(vec3(0,-100.5,-1), 100, new lambertian(vec3(0.8, 0.8, 0.0)));
-    list[2] = new sphere(vec3(1,0,-1), 0.5, new metal(vec3(0.8, 0.6, 0.2), 0.0));
-    list[3] = new sphere(vec3(-1,0,-1), 0.5, new dielectric(1.5));
-    list[4] = new sphere(vec3(-1,0,-1), -0.45, new dielectric(1.5));
-    hitable *world = new hitable_list(list,5);
-    world = random_scene();
+    hitable *world = random_scene();
 
     vec3 lookfrom(13,2,3);
     vec3 lookat(0,0,0);

@@ -6,11 +6,21 @@
 class sphere: public hitable  {
     public:
         sphere() {}
-        sphere(vec3 cen, float r, material *m) : center(cen), radius(r), mat_ptr(m)  {};
+        sphere(vec3 cen, float r, material *m) : center(cen), radius(r), mat_ptr(m)  {
+            auto rvec = vec3(r, r, r);
+            bbox = aabb(cen - rvec, cen + rvec);
+        };
         virtual bool hit(const ray& r, float tmin, float tmax, hit_record& rec) const;
         vec3 center;
         float radius;
         material *mat_ptr;
+        aabb bbox;
+        aabb bounding_box() const override { return bbox; }
+        void print() const override {
+            std::cerr << "[sphere] c = [" << center.x() << ", "
+                << center.y() << ", " << center.z() << "], r = " << radius << std::endl;
+            bbox.print();
+        }
 };
 
 bool sphere::hit(const ray& r, float t_min, float t_max, hit_record& rec) const {
