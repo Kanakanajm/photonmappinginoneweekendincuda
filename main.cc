@@ -103,6 +103,7 @@ int main() {
     stop = clock();
     double timer_seconds = ((double)(stop - start)) / CLOCKS_PER_SEC;
     std::cerr << "took " << timer_seconds << " seconds.\n";
+    delete world;
 }
 
 

@@ -44,8 +44,10 @@ bool bvh_node::hit(const ray& r, float t_min, float t_max, hit_record& rec) cons
     if (!bbox.hit(r, t_min, t_max))
         return false;
 
-    bool hit_left = left->hit(r, t_min, t_max, rec);
-    bool hit_right = right->hit(r, t_min, hit_left ? rec.t : t_max, rec);
+    // check intersections for the left and right children
+    // make sure they are not nullptr first
+    bool hit_left = left && left->hit(r, t_min, t_max, rec);
+    bool hit_right = right && right->hit(r, t_min, hit_left ? rec.t : t_max, rec);
 
     return hit_left || hit_right;
 }
@@ -66,19 +68,25 @@ static bool box_z_compare (hitable* a, hitable* b) {
 }
 
 bvh_node::bvh_node(hitable **l, size_t start, size_t end) {
+    size_t object_span = end - start;
+    if (object_span < 1)
+        // left = nullptr;
+        // right = nullptr;
+        return;
+        
+    // use the longest axis heuristic
     bbox = l[start]->bounding_box();
     for (size_t i=start; i < end; i++)
         bbox = aabb(bbox, l[i]->bounding_box());
-    // use the longest axis heuristic
     int axis = bbox.longest_axis();
 
     auto comparator = (axis == 0) ? box_x_compare
                     : (axis == 1) ? box_y_compare
                     : box_z_compare;
 
-    size_t object_span = end - start;
     if (object_span == 1) {
-        left = right = l[start];
+        left = l[start];
+        // right = nullptr;
     } else if (object_span == 2) {
         left = l[start];
         right = l[start+1];
